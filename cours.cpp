@@ -131,7 +131,7 @@ bool COURS::ajouter()
 
     query.prepare(
         "INSERT INTO COURS "
-        "(ID_COUR, NOM, DESCRIPTION, DATE_DEBUT, DATE_FIN, PRIX, NIVEAU ID_FORMATEUR) "
+        "(ID_COUR, NOM, DESCRIPTION, DATE_DEBUT, DATE_FIN, PRIX, NIVEAU ,ID_FORMATEUR) "
         "VALUES "
         "(:id, :nom, :description, :date_debut, :date_fin, :prix, :niveau, :id_formateur)"
         );
@@ -230,4 +230,36 @@ bool COURS::idExists(int id)
     }
 
     return false;
+}
+
+
+QList<int> COURS::ListIdFORMATEUR(){
+    QList<int> Liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT ID_FORMATEUR FROM FORMATEURS ");
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            Liste.append(query.value(0).toInt());
+        }
+    }
+    return Liste;
+
+}
+
+
+QSqlQueryModel* COURS::chercher(QString column, QString text)
+{
+    QSqlQueryModel* model = new QSqlQueryModel();
+    model->setQuery("SELECT * FROM COURS WHERE " + column + " LIKE '%" + text + "%'"); // NOM   LIKE  '%az%'  = az
+    return model;
+}
+
+QSqlQueryModel* COURS::tri(QString column, QString choix)//(SELECT * FROM FORMATEURS ORDER BY  nom ASC)
+{
+    QSqlQueryModel* model = new QSqlQueryModel();
+    model->setQuery("SELECT * FROM COURS ORDER BY " + column + " " + choix);
+    return model;
 }

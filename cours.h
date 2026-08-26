@@ -50,6 +50,12 @@ public:
 
     bool idExists(int id);
 
+
+    QList<int> ListIdFORMATEUR();
+
+    QSqlQueryModel* chercher(QString column, QString text);
+    QSqlQueryModel* tri(QString column, QString choix);
+
 private:
     int ID_COUR;
     QString nom;

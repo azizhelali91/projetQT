@@ -1,6 +1,11 @@
 #include "mainwindow.h"
 #include "qmessagebox.h"
 #include "ui_mainwindow.h"
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QTextDocument>
+#include <QPrinter>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     //lors de l'execution ! ,  une seul fois ! ,
     ui->setupUi(this);
+    remplir_comboBox_formateur();
 
     //affichage
     ui->tableView_formateur->setModel(f.afficher());
@@ -31,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->prenom_formateur->setValidator(charValidator);
 
     ui->nom_cour->setValidator(charValidator);
+
+    ui->debut_cour->setDate(QDate::currentDate());
+    ui->fin_cour->setDate(QDate::currentDate());
 }
 
 MainWindow::~MainWindow()
@@ -128,7 +137,7 @@ void MainWindow::on_ajouter_formateur_clicked()
         ui->telephone_formateur->clear();
         ui->embauche_formateur->setDate(QDate::currentDate());
 
-
+        remplir_comboBox_formateur();
     }
     else
     {
@@ -295,6 +304,7 @@ void MainWindow::on_supprimer_formateur_clicked()
         ui->cin_formateur->clear();
         ui->telephone_formateur->clear();
         ui->embauche_formateur->setDate(QDate::currentDate());
+        remplir_comboBox_formateur();
     }
     else
     {
@@ -321,3 +331,431 @@ void MainWindow::on_recherche_formateur_clicked()
 
 }
 
+
+void MainWindow::on_refresh_formateur_clicked()
+{
+    ui->tableView_formateur->setModel(f.afficher());
+
+}
+
+void MainWindow::remplir_comboBox_formateur()
+{
+    ui->id_formateur_cour->clear();
+
+    QList<int> liste=c.ListIdFORMATEUR();
+
+    for(int i=0 ;i<liste.length();i++)
+    {
+        ui->id_formateur_cour->addItem(QString::number(liste[i]));
+    }
+
+
+}
+
+
+
+void MainWindow::on_ajouter_cour_clicked()
+{
+    int id_cour=ui->id_cour->text().toInt();
+    QString nom =ui->nom_cour->text();
+    QString description=ui->description_cour->text();
+    QDate date_debut=ui->debut_cour->date();
+    QDate date_fin=ui->fin_cour->date();
+    int prix=ui->prix_cour->text().toInt();
+    QString niveau=ui->niveau_cour->currentText();
+    int id_formateur_cour=ui->id_formateur_cour->currentText().toInt();
+
+
+    //Etape2: controle de saisie
+
+
+    if(c.idExists(id_cour)==true)
+    {
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("Le id deja existe"), QMessageBox::Cancel);
+        return;
+
+    }
+
+    if (date_debut> date_fin) {
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("date de fin doit etre supérieur à la date de debut "), QMessageBox::Cancel);
+        return;
+    }
+
+
+    if(nom==""||description==""||id_cour==0||prix==0)
+    {
+
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("Tu dois remplir tous les champs"), QMessageBox::Cancel);
+        return;
+    }
+
+
+    //Etape3: appel du fonction ajout !
+
+    COURS c( id_cour,
+                 nom,
+                 description,
+                 date_debut,
+                 date_fin,
+                 prix,
+                 niveau,
+                 id_formateur_cour);
+
+    bool  test= c.ajouter();
+
+    //Etape4:  affichage du message succés ou échoué
+
+    if(test==true)
+    {
+        QMessageBox::information(nullptr, QObject::tr(""),
+                                 QObject::tr("Ajout avec succées"), QMessageBox::Cancel);
+        ui->tableView_cour->setModel(c.afficher());
+
+        ui->id_cour->clear();
+        ui->nom_cour->clear();
+        ui->description_cour->clear();
+        ui->debut_cour->setDate(QDate::currentDate());
+        ui->fin_cour->setDate(QDate::currentDate());
+        ui->prix_cour->clear();
+
+
+
+
+    }
+    else
+    {
+        QMessageBox::information(nullptr, QObject::tr(""),
+                                 QObject::tr("Ajout échoué"), QMessageBox::Cancel);
+    }
+
+}
+
+
+void MainWindow::on_tableView_cour_clicked(const QModelIndex &index)
+{
+    //etape1: numero du ligne ! clicked !
+    QAbstractItemModel* model = ui->tableView_cour->model();
+
+    int row = index.row();
+    //etape2:  table du format matrice , recuperation du donne
+    QString id_cour = model->data(model->index(row, 0)).toString();
+    QString nom = model->data(model->index(row, 1)).toString();
+    QString description = model->data(model->index(row, 2)).toString();
+    QDate date_debut = model->data(model->index(row, 3)).toDate();
+    QDate date_fin = model->data(model->index(row, 4)).toDate();
+    QString prix = model->data(model->index(row, 5)).toString();
+    QString niveau = model->data(model->index(row, 6)).toString();
+    QString id_formateur_cour = model->data(model->index(row, 7)).toString();
+
+    //etape3: insertion dans ui  ( lineEdit , comboBox)
+    ui->id_cour->setText(id_cour);
+    ui->nom_cour->setText(nom);
+    ui->description_cour->setText(description);
+    ui->debut_cour->setDate(date_debut);
+    ui->fin_cour->setDate(date_fin);
+    ui->prix_cour->setText(prix);
+    ui->niveau_cour->setCurrentText(niveau);
+    ui->id_formateur_cour->setCurrentText(id_formateur_cour);
+}
+
+
+void MainWindow::on_modifier_cour_clicked()
+{
+    int id_cour=ui->id_cour->text().toInt();
+    QString nom =ui->nom_cour->text();
+    QString description=ui->description_cour->text();
+    QDate date_debut=ui->debut_cour->date();
+    QDate date_fin=ui->fin_cour->date();
+    int prix=ui->prix_cour->text().toInt();
+    QString niveau=ui->niveau_cour->currentText();
+    int id_formateur_cour=ui->id_formateur_cour->currentText().toInt();
+
+
+    //Etape2: controle de saisie
+
+
+    if(c.idExists(id_cour)==false)
+    {
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("Le id n'existe pas "), QMessageBox::Cancel);
+        return;
+
+    }
+
+    if (date_debut> date_fin) {
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("date de fin doit etre supérieur à la date de debut "), QMessageBox::Cancel);
+        return;
+    }
+
+
+    if(nom==""||description==""||id_cour==0||prix==0)
+    {
+
+        QMessageBox::critical(nullptr, QObject::tr(""),
+                              QObject::tr("Tu dois remplir tous les champs"), QMessageBox::Cancel);
+        return;
+    }
+
+
+    //Etape3: appel du fonction ajout !
+
+    COURS c( id_cour,
+            nom,
+            description,
+            date_debut,
+            date_fin,
+            prix,
+            niveau,
+            id_formateur_cour);
+
+    bool  test= c.modifier();
+
+    //Etape4:  affichage du message succés ou échoué
+
+    if(test==true)
+    {
+        QMessageBox::information(nullptr, QObject::tr(""),
+                                 QObject::tr("Modification avec succées"), QMessageBox::Cancel);
+        ui->tableView_cour->setModel(c.afficher());
+
+        ui->id_cour->clear();
+        ui->nom_cour->clear();
+        ui->description_cour->clear();
+        ui->debut_cour->setDate(QDate::currentDate());
+        ui->fin_cour->setDate(QDate::currentDate());
+        ui->prix_cour->clear();
+
+
+
+
+    }
+    else
+    {
+        QMessageBox::information(nullptr, QObject::tr(""),
+                                 QObject::tr("Modification échoué"), QMessageBox::Cancel);
+    }
+
+}
+
+
+
+void MainWindow::on_supprimer_cour_clicked()
+{
+    {
+
+        //récuperation d'apres ui
+        int id_cour= ui->id_cour->text().toInt();
+
+        //controle de saisie
+        if(c.idExists(id_cour)==false)
+        {
+            QMessageBox::critical(nullptr, QObject::tr(""),
+                                  QObject::tr("Le id n'existe pas"), QMessageBox::Cancel);
+            return;
+
+        }
+        //action supprimer
+        bool test= c.supprimer(id_cour);
+        //affichage du message
+        if(test==true)
+        {
+            QMessageBox::information(nullptr, QObject::tr(""),
+                                     QObject::tr("Suppression avec succées"), QMessageBox::Cancel);
+            ui->tableView_cour->setModel(c.afficher());
+
+            ui->id_cour->clear();
+            ui->nom_cour->clear();
+            ui->description_cour->clear();
+            ui->debut_cour->setDate(QDate::currentDate());
+            ui->fin_cour->setDate(QDate::currentDate());
+            ui->prix_cour->clear();
+
+        }
+        else
+        {
+            QMessageBox::critical(nullptr, QObject::tr(""),
+                                  QObject::tr("Suppression échoué"), QMessageBox::Cancel);
+        }
+    }
+
+}
+
+
+void MainWindow::on_tri_cour_clicked()
+{
+    QString ordre = ui->ordre_cour->currentText();
+   QString column= ui->choix_cour->currentText();
+    ui->tableView_cour->setModel(c.tri(column,ordre));
+
+}
+
+
+void MainWindow::on_refresh_cour_clicked()
+{
+    ui->tableView_cour->setModel(c.afficher());
+}
+
+
+void MainWindow::on_recherche_cour_clicked()
+{
+    QString text = ui->chercher_text_cour->text();
+    QString column= ui->choix_cour->currentText();
+    ui->tableView_cour->setModel(c.chercher(column,text));
+}
+
+
+void MainWindow::on_pdf_cour_clicked()
+{
+    QString strStream;
+    QTextStream out(&strStream);
+
+    const int rowCount = ui->tableView_cour->model()->rowCount();
+    const int columnCount = ui->tableView_cour->model()->columnCount();
+
+    out << "<html>\n"
+           "<head>\n"
+           "<meta Content=\"Text/html; charset=Windows-1251\">\n"
+           "<title>%1</title>\n"
+           "<style>\n"
+           "table {\n"
+           "    width: 100%;\n"
+           "    border-collapse: collapse;\n"
+           "}\n"
+           "th, td {\n"
+           "    padding: 8px;\n"
+           "    text-align: left;\n"
+           "    border-bottom: 1px solid #ddd;\n"
+           "}\n"
+           "tr:nth-child(even) {\n"
+           "    background-color: #f2f2f2;\n"
+           "}\n"
+           "</style>\n"
+           "</head>\n"
+           "<body bgcolor=#ffffff link=#5000A0>\n"
+           "<center> <H1>Liste des cours</H1></center><br/><br/>\n"
+           "<table>\n";
+
+    // headers
+    out << "<thead><tr bgcolor=#f0f0f0> <th>Numero</th>";
+    for (int column = 0; column < columnCount; column++)
+    {
+        if (!ui->tableView_cour->isColumnHidden(column))
+        {
+            out << QString("<th>%1</th>").arg(ui->tableView_cour->model()->headerData(column, Qt::Horizontal).toString());
+        }
+    }
+    out << "</tr></thead>\n";
+
+    // data table
+    for (int row = 0; row < rowCount; row++)
+    {
+        out << "<tr> <td>" << row + 1 << "</td>";
+        for (int column = 0; column < columnCount; column++)
+        {
+            if (!ui->tableView_cour->isColumnHidden(column))
+            {
+                QString data = ui->tableView_cour->model()->data(ui->tableView_cour->model()->index(row, column)).toString().simplified();
+                out << QString("<td>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
+            }
+        }
+        out << "</tr>\n";
+    }
+
+
+
+    QString fileName = QFileDialog::getSaveFileName((QWidget *)0, "Sauvegarder en PDF", QString(), "*.pdf");
+    if (QFileInfo(fileName).suffix().isEmpty())
+    {
+        fileName.append(".pdf");
+    }
+
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setPageSize(QPageSize::A4);
+    printer.setOutputFileName(fileName);
+
+    QTextDocument doc;
+    doc.setHtml(strStream);
+    doc.print(&printer);
+
+}
+
+void MainWindow::on_pdf_formateur_clicked()
+{
+    QString strStream;
+    QTextStream out(&strStream);
+
+    const int rowCount = ui->tableView_formateur->model()->rowCount();
+    const int columnCount = ui->tableView_formateur->model()->columnCount();
+
+    out << "<html>\n"
+           "<head>\n"
+           "<meta Content=\"Text/html; charset=Windows-1251\">\n"
+           "<title>%1</title>\n"
+           "<style>\n"
+           "table {\n"
+           "    width: 100%;\n"
+           "    border-collapse: collapse;\n"
+           "}\n"
+           "th, td {\n"
+           "    padding: 8px;\n"
+           "    text-align: left;\n"
+           "    border-bottom: 1px solid #ddd;\n"
+           "}\n"
+           "tr:nth-child(even) {\n"
+           "    background-color: #f2f2f2;\n"
+           "}\n"
+           "</style>\n"
+           "</head>\n"
+           "<body bgcolor=#ffffff link=#5000A0>\n"
+           "<center> <H1>Liste des formateurs</H1></center><br/><br/>\n"
+           "<table>\n";
+
+    // headers
+    out << "<thead><tr bgcolor=#f0f0f0> <th>Numero</th>";
+    for (int column = 0; column < columnCount; column++)
+    {
+        if (!ui->tableView_formateur->isColumnHidden(column))
+        {
+            out << QString("<th>%1</th>").arg(ui->tableView_formateur->model()->headerData(column, Qt::Horizontal).toString());
+        }
+    }
+    out << "</tr></thead>\n";
+
+    // data table
+    for (int row = 0; row < rowCount; row++)
+    {
+        out << "<tr> <td>" << row + 1 << "</td>";
+        for (int column = 0; column < columnCount; column++)
+        {
+            if (!ui->tableView_formateur->isColumnHidden(column))
+            {
+                QString data = ui->tableView_formateur->model()->data(ui->tableView_formateur->model()->index(row, column)).toString().simplified();
+                out << QString("<td>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
+            }
+        }
+        out << "</tr>\n";
+    }
+
+
+
+    QString fileName = QFileDialog::getSaveFileName((QWidget *)0, "Sauvegarder en PDF", QString(), "*.pdf");
+    if (QFileInfo(fileName).suffix().isEmpty())
+    {
+        fileName.append(".pdf");
+    }
+
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setPageSize(QPageSize::A4);
+    printer.setOutputFileName(fileName);
+
+    QTextDocument doc;
+    doc.setHtml(strStream);
+    doc.print(&printer);
+
+}

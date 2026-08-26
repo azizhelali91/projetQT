@@ -60,6 +60,7 @@ public:
     QPushButton *stat_formateur;
     QComboBox *ordre_formateur;
     QLineEdit *text_chercher_formateur;
+    QPushButton *refresh_formateur;
     QWidget *tab_cours;
     QComboBox *niveau_cour;
     QLineEdit *nom_cour;
@@ -87,6 +88,9 @@ public:
     QLineEdit *prix_cour;
     QDateEdit *fin_cour;
     QDateEdit *debut_cour;
+    QPushButton *refresh_cour;
+    QComboBox *ordre_cour;
+    QLineEdit *chercher_text_cour;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -99,7 +103,7 @@ public:
         centralwidget->setObjectName("centralwidget");
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName("tabWidget");
-        tabWidget->setGeometry(QRect(0, 0, 1920, 1080));
+        tabWidget->setGeometry(QRect(30, 0, 1920, 1080));
         tabWidget->setStyleSheet(QString::fromUtf8("background-color:#87CEEB;"));
         tab_formateur = new QWidget();
         tab_formateur->setObjectName("tab_formateur");
@@ -178,7 +182,7 @@ public:
         tri_formateur->setGeometry(QRect(490, 80, 131, 31));
         recherche_formateur = new QPushButton(tab_formateur);
         recherche_formateur->setObjectName("recherche_formateur");
-        recherche_formateur->setGeometry(QRect(1240, 80, 131, 31));
+        recherche_formateur->setGeometry(QRect(1030, 40, 131, 31));
         choix_formateur = new QComboBox(tab_formateur);
         choix_formateur->addItem(QString());
         choix_formateur->addItem(QString());
@@ -204,6 +208,9 @@ public:
         text_chercher_formateur = new QLineEdit(tab_formateur);
         text_chercher_formateur->setObjectName("text_chercher_formateur");
         text_chercher_formateur->setGeometry(QRect(1030, 80, 191, 31));
+        refresh_formateur = new QPushButton(tab_formateur);
+        refresh_formateur->setObjectName("refresh_formateur");
+        refresh_formateur->setGeometry(QRect(490, 30, 131, 31));
         tabWidget->addTab(tab_formateur, QString());
         tab_cours = new QWidget();
         tab_cours->setObjectName("tab_cours");
@@ -270,6 +277,14 @@ public:
         tableView_cour->setObjectName("tableView_cour");
         tableView_cour->setGeometry(QRect(380, 110, 1331, 361));
         choix_cour = new QComboBox(tab_cours);
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
+        choix_cour->addItem(QString());
         choix_cour->setObjectName("choix_cour");
         choix_cour->setGeometry(QRect(650, 70, 161, 31));
         modifier_cour = new QPushButton(tab_cours);
@@ -290,6 +305,17 @@ public:
         debut_cour = new QDateEdit(tab_cours);
         debut_cour->setObjectName("debut_cour");
         debut_cour->setGeometry(QRect(170, 250, 171, 31));
+        refresh_cour = new QPushButton(tab_cours);
+        refresh_cour->setObjectName("refresh_cour");
+        refresh_cour->setGeometry(QRect(490, 30, 131, 31));
+        ordre_cour = new QComboBox(tab_cours);
+        ordre_cour->addItem(QString());
+        ordre_cour->addItem(QString());
+        ordre_cour->setObjectName("ordre_cour");
+        ordre_cour->setGeometry(QRect(650, 30, 161, 31));
+        chercher_text_cour = new QLineEdit(tab_cours);
+        chercher_text_cour->setObjectName("chercher_text_cour");
+        chercher_text_cour->setGeometry(QRect(850, 30, 131, 31));
         tabWidget->addTab(tab_cours, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -344,6 +370,7 @@ public:
         ordre_formateur->setItemText(0, QCoreApplication::translate("MainWindow", "ASC", nullptr));
         ordre_formateur->setItemText(1, QCoreApplication::translate("MainWindow", "DESC", nullptr));
 
+        refresh_formateur->setText(QCoreApplication::translate("MainWindow", "REFRESH", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_formateur), QCoreApplication::translate("MainWindow", "gestion formateur", nullptr));
         niveau_cour->setItemText(0, QCoreApplication::translate("MainWindow", "Debutant", nullptr));
         niveau_cour->setItemText(1, QCoreApplication::translate("MainWindow", "Intermediaire", nullptr));
@@ -364,8 +391,21 @@ public:
         label_25->setText(QCoreApplication::translate("MainWindow", "NOM", nullptr));
         label_26->setText(QCoreApplication::translate("MainWindow", "DATE DE FIN", nullptr));
         ajouter_cour->setText(QCoreApplication::translate("MainWindow", "AJOUTER", nullptr));
+        choix_cour->setItemText(0, QCoreApplication::translate("MainWindow", "ID_COUR", nullptr));
+        choix_cour->setItemText(1, QCoreApplication::translate("MainWindow", "NOM", nullptr));
+        choix_cour->setItemText(2, QCoreApplication::translate("MainWindow", "DESCRIPTION", nullptr));
+        choix_cour->setItemText(3, QCoreApplication::translate("MainWindow", "DATE_DEBUT", nullptr));
+        choix_cour->setItemText(4, QCoreApplication::translate("MainWindow", "DATE_FIN", nullptr));
+        choix_cour->setItemText(5, QCoreApplication::translate("MainWindow", "PRIX", nullptr));
+        choix_cour->setItemText(6, QCoreApplication::translate("MainWindow", "NIVEAU", nullptr));
+        choix_cour->setItemText(7, QCoreApplication::translate("MainWindow", "ID_FORMATEUR", nullptr));
+
         modifier_cour->setText(QCoreApplication::translate("MainWindow", "MODIFIER", nullptr));
         label_29->setText(QCoreApplication::translate("MainWindow", "ID FORMATEUR", nullptr));
+        refresh_cour->setText(QCoreApplication::translate("MainWindow", "REFRESH", nullptr));
+        ordre_cour->setItemText(0, QCoreApplication::translate("MainWindow", "ASC", nullptr));
+        ordre_cour->setItemText(1, QCoreApplication::translate("MainWindow", "DESC", nullptr));
+
         tabWidget->setTabText(tabWidget->indexOf(tab_cours), QCoreApplication::translate("MainWindow", "gestion cour", nullptr));
     } // retranslateUi
 

@@ -33,6 +33,28 @@ private slots:
 
     void on_recherche_formateur_clicked();
 
+    void on_refresh_formateur_clicked();
+
+    void remplir_comboBox_formateur();
+
+    void on_ajouter_cour_clicked();
+
+    void on_tableView_cour_clicked(const QModelIndex &index);
+
+    void on_modifier_cour_clicked();
+
+    void on_supprimer_cour_clicked();
+
+    void on_tri_cour_clicked();
+
+    void on_refresh_cour_clicked();
+
+    void on_recherche_cour_clicked();
+
+    void on_pdf_cour_clicked();
+
+    void on_pdf_formateur_clicked();
+
 private:
     Ui::MainWindow *ui;
 

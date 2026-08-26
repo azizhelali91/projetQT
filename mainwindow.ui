@@ -17,7 +17,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>30</x>
       <y>0</y>
       <width>1920</width>
       <height>1080</height>
@@ -436,6 +436,19 @@
        </rect>
       </property>
      </widget>
+     <widget class="QPushButton" name="refresh_formateur">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>30</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>REFRESH</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_cours">
      <attribute name="title">
@@ -707,6 +720,46 @@
         <height>31</height>
        </rect>
       </property>
+      <item>
+       <property name="text">
+        <string>ID_COUR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>NOM</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DESCRIPTION</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DATE_DEBUT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DATE_FIN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PRIX</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>NIVEAU</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ID_FORMATEUR</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="modifier_cour">
       <property name="geometry">
@@ -770,6 +823,49 @@
         <x>170</x>
         <y>250</y>
         <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="refresh_cour">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>30</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>REFRESH</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="ordre_cour">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>30</y>
+        <width>161</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>ASC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DESC</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLineEdit" name="chercher_text_cour">
+      <property name="geometry">
+       <rect>
+        <x>850</x>
+        <y>30</y>
+        <width>131</width>
         <height>31</height>
        </rect>
       </property>
