@@ -281,3 +281,64 @@ QMap<QString, int> COURS::statistiquesParNiveau() {
 
     return niveauStats;
 }
+
+
+
+
+QList<QDate> COURS::getDatesFromDatabase()
+{
+    QList<QDate> datesList;
+
+    QSqlQuery query;
+    query.prepare("SELECT DATE_DEBUT, DATE_FIN FROM COURS");
+
+    if (query.exec()) {
+
+        while (query.next()) {
+
+            QDate dateDebut = query.value(0).toDate();
+            QDate dateFin = query.value(1).toDate();
+
+            if (dateDebut.isValid() && dateFin.isValid()) {
+
+                QDate date = dateDebut;
+
+                while (date <= dateFin) {
+
+                    if (!datesList.contains(date)) {
+                        datesList.append(date);
+                    }
+
+                    date = date.addDays(1);
+                }
+            }
+        }
+
+    }
+    return datesList;
+}
+
+
+QSqlQueryModel* COURS::afficherd(QDate date)
+{
+    QSqlQueryModel *model = new QSqlQueryModel();
+
+    QSqlQuery query;
+
+    query.prepare(
+        "SELECT * FROM COURS "
+       " WHERE :date BETWEEN DATE_DEBUT AND DATE_FIN"
+        );
+
+    query.bindValue(":date", date);
+
+    if (!query.exec()) {
+
+
+        return nullptr;
+    }
+
+    model->setQuery(query);
+
+    return model;
+}

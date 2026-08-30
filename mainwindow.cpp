@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 #include <QProgressBar>
+#include "email.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     //affichage
     ui->tableView_formateur->setModel(f.afficher());
     ui->tableView_cour->setModel(c.afficher());
+    ui->tableView_calendrier->setModel(c.afficher());
 
 
     ui->embauche_formateur->setDate(QDate::currentDate());
@@ -42,6 +44,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->debut_cour->setDate(QDate::currentDate());
     ui->fin_cour->setDate(QDate::currentDate());
+
+
+
+
+    //calendrier !!
+    QCalendarWidget* calendarWidget = ui->calendarWidget;
+
+    // Clear existing date text formats
+    calendarWidget->setDateTextFormat(QDate(), QTextCharFormat());
+
+    QList<QDate> datesList = c.getDatesFromDatabase();
+
+    for (const QDate& targetDate : datesList)
+    {
+        QTextCharFormat format =
+            calendarWidget->dateTextFormat(targetDate);
+
+        format.setForeground(Qt::blue);
+
+        calendarWidget->setDateTextFormat(targetDate, format);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -424,7 +447,49 @@ void MainWindow::on_ajouter_cour_clicked()
         ui->prix_cour->clear();
 
 
+        QString destinataireEmail=f.getEmailByIdFormateur(id_formateur_cour);
+        QString objetEmail="Nouveau cours attribué – " +nom;
 
+        QString bodyEmail =
+            "Nous vous informons qu’un nouveau cours vous a été attribué au sein du centre de formation.\n\n"
+            "📚 Informations du cours\n\n"
+            "ID du cours : " + QString::number(id_cour) + "\n"
+                                         "Nom du cours : " + nom + "\n"
+                         "Description : " + description + "\n"
+                                 "Date de début : " + date_debut.toString("dd/MM/yyyy") + "\n"
+                                                  "Date de fin : " + date_fin.toString("dd/MM/yyyy") + "\n"
+                                                "Prix : " + QString::number(prix) + " DT\n"
+                                      "Niveau : " + niveau + "\n\n"
+                       "Nous vous invitons à prendre connaissance de ces informations "
+                       "et à vous préparer en conséquence pour le démarrage du cours.\n\n"
+                       "Pour toute question ou information complémentaire, veuillez "
+                       "contacter l’administration du centre.\n\n"
+                       "Cordialement,\n\n"
+                       "Administration du centre de formation";
+
+        mailer::sendEmail(destinataireEmail,
+                          objetEmail,
+                          bodyEmail);
+
+
+
+        //calendrier !!
+        QCalendarWidget* calendarWidget = ui->calendarWidget;
+
+        // Clear existing date text formats
+        calendarWidget->setDateTextFormat(QDate(), QTextCharFormat());
+
+        QList<QDate> datesList = c.getDatesFromDatabase();
+
+        for (const QDate& targetDate : datesList)
+        {
+            QTextCharFormat format =
+                calendarWidget->dateTextFormat(targetDate);
+
+            format.setForeground(Qt::blue);
+
+            calendarWidget->setDateTextFormat(targetDate, format);
+        }
 
     }
     else
@@ -532,7 +597,23 @@ void MainWindow::on_modifier_cour_clicked()
         ui->prix_cour->clear();
 
 
+        //calendrier !!
+        QCalendarWidget* calendarWidget = ui->calendarWidget;
 
+        // Clear existing date text formats
+        calendarWidget->setDateTextFormat(QDate(), QTextCharFormat());
+
+        QList<QDate> datesList = c.getDatesFromDatabase();
+
+        for (const QDate& targetDate : datesList)
+        {
+            QTextCharFormat format =
+                calendarWidget->dateTextFormat(targetDate);
+
+            format.setForeground(Qt::blue);
+
+            calendarWidget->setDateTextFormat(targetDate, format);
+        }
 
     }
     else
@@ -576,6 +657,24 @@ void MainWindow::on_supprimer_cour_clicked()
             ui->fin_cour->setDate(QDate::currentDate());
             ui->prix_cour->clear();
 
+
+            //calendrier !!
+            QCalendarWidget* calendarWidget = ui->calendarWidget;
+
+            // Clear existing date text formats
+            calendarWidget->setDateTextFormat(QDate(), QTextCharFormat());
+
+            QList<QDate> datesList = c.getDatesFromDatabase();
+
+            for (const QDate& targetDate : datesList)
+            {
+                QTextCharFormat format =
+                    calendarWidget->dateTextFormat(targetDate);
+
+                format.setForeground(Qt::blue);
+
+                calendarWidget->setDateTextFormat(targetDate, format);
+            }
         }
         else
         {
@@ -1118,4 +1217,17 @@ void MainWindow::on_statistique_cour_clicked()
     mainLayout->addStretch();
 
     dialog->exec();
+}
+
+
+
+
+
+
+
+
+
+void MainWindow::on_calendarWidget_clicked(const QDate &date)
+{
+    ui->tableView_calendrier->setModel(c.afficherd(date));
 }

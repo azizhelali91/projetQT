@@ -59,6 +59,8 @@ private slots:
 
     void on_statistique_cour_clicked();
 
+    void on_calendarWidget_clicked(const QDate &date);
+
 private:
     Ui::MainWindow *ui;
 

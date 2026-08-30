@@ -58,6 +58,7 @@ public:
 
     QMap<QString, int> statistiquesParSPECIALITE();
 
+    QString getEmailByIdFormateur(int id);
 
 private:
     int id_formateur;

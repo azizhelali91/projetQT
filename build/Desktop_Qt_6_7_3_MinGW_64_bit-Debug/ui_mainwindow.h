@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCalendarWidget>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateEdit>
 #include <QtWidgets/QHeaderView>
@@ -91,6 +92,9 @@ public:
     QPushButton *refresh_cour;
     QComboBox *ordre_cour;
     QLineEdit *chercher_text_cour;
+    QWidget *tab_calendrier;
+    QCalendarWidget *calendarWidget;
+    QTableView *tableView_calendrier;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -317,6 +321,15 @@ public:
         chercher_text_cour->setObjectName("chercher_text_cour");
         chercher_text_cour->setGeometry(QRect(850, 30, 131, 31));
         tabWidget->addTab(tab_cours, QString());
+        tab_calendrier = new QWidget();
+        tab_calendrier->setObjectName("tab_calendrier");
+        calendarWidget = new QCalendarWidget(tab_calendrier);
+        calendarWidget->setObjectName("calendarWidget");
+        calendarWidget->setGeometry(QRect(190, 90, 601, 161));
+        tableView_calendrier = new QTableView(tab_calendrier);
+        tableView_calendrier->setObjectName("tableView_calendrier");
+        tableView_calendrier->setGeometry(QRect(70, 270, 1061, 271));
+        tabWidget->addTab(tab_calendrier, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -328,7 +341,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -407,6 +420,7 @@ public:
         ordre_cour->setItemText(1, QCoreApplication::translate("MainWindow", "DESC", nullptr));
 
         tabWidget->setTabText(tabWidget->indexOf(tab_cours), QCoreApplication::translate("MainWindow", "gestion cour", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_calendrier), QCoreApplication::translate("MainWindow", "Calendrier", nullptr));
     } // retranslateUi
 
 };

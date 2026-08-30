@@ -57,6 +57,9 @@ public:
     QSqlQueryModel* tri(QString column, QString choix);
     QMap<QString, int> statistiquesParNiveau();
 
+    QList<QDate> getDatesFromDatabase();
+    QSqlQueryModel* afficherd(QDate date);
+
 private:
     int ID_COUR;
     QString nom;

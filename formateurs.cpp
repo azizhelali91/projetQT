@@ -237,3 +237,19 @@ QMap<QString, int> formateurs::statistiquesParSPECIALITE() {
 
     return specialiteStats;
 }
+
+
+
+QString formateurs::getEmailByIdFormateur(int id)
+{
+    QSqlQuery query;
+    QString email="";
+    query.prepare("SELECT EMAIL FROM FORMATEURS WHERE ID_FORMATEUR = :id");
+    query.bindValue(":id", id);
+
+    if (query.exec() && query.next()) {
+         email = query.value(0).toString();
+    }
+
+    return email;
+}
