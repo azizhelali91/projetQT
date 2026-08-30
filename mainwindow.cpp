@@ -6,6 +6,8 @@
 #include <QTextDocument>
 #include <QPrinter>
 #include <QTextStream>
+#include <QVBoxLayout>
+#include <QProgressBar>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -758,4 +760,362 @@ void MainWindow::on_pdf_formateur_clicked()
     doc.setHtml(strStream);
     doc.print(&printer);
 
+}
+
+void MainWindow::on_stat_formateur_clicked()
+{
+    QMap<QString, int> stats = f.statistiquesParSPECIALITE();
+
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Statistiques des formateurs par spécialité");
+    dialog->resize(650, 450);
+
+    // =========================
+    // STYLE DU DIALOG
+    // =========================
+    dialog->setStyleSheet(
+        "QDialog {"
+        "    background-color: #1e1e1e;"
+        "}"
+        "QLabel {"
+        "    color: white;"
+        "}"
+        "QProgressBar {"
+        "    border: none;"
+        "    background-color: #3a3a3a;"
+        "    border-radius: 8px;"
+        "    height: 14px;"
+        "    text-align: center;"
+        "}"
+        "QProgressBar::chunk {"
+        "    background-color: #e50914;"
+        "    border-radius: 8px;"
+        "}"
+        );
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(dialog);
+    mainLayout->setContentsMargins(25, 25, 25, 25);
+    mainLayout->setSpacing(18);
+
+    // =========================
+    // TITRE
+    // =========================
+    QLabel *title = new QLabel(
+        "Répartition des formateurs par spécialité"
+        );
+
+    title->setStyleSheet(
+        "QLabel {"
+        "    color: white;"
+        "    font-size: 20px;"
+        "    font-weight: bold;"
+        "    padding-bottom: 10px;"
+        "}"
+        );
+
+    mainLayout->addWidget(title);
+
+    // =========================
+    // CALCUL DU TOTAL
+    // =========================
+    int total = 0;
+
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        total += it.value();
+    }
+
+    // =========================
+    // STATISTIQUES
+    // =========================
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        QString specialite = it.key();
+        int nombre = it.value();
+
+        double pourcentage = 0;
+
+        if (total > 0)
+        {
+            pourcentage = (nombre * 100.0) / total;
+        }
+
+        // =========================
+        // CARD
+        // =========================
+        QFrame *card = new QFrame();
+
+        card->setStyleSheet(
+            "QFrame {"
+            "    background-color: #292929;"
+            "    border: 1px solid #3d3d3d;"
+            "    border-radius: 12px;"
+            "}"
+            );
+
+        QVBoxLayout *cardLayout = new QVBoxLayout(card);
+
+        cardLayout->setContentsMargins(18, 15, 18, 15);
+        cardLayout->setSpacing(10);
+
+        // =========================
+        // LIGNE DU HAUT
+        // =========================
+        QHBoxLayout *topLayout = new QHBoxLayout();
+
+        QLabel *specialiteLabel = new QLabel(
+            specialite
+            );
+
+        specialiteLabel->setStyleSheet(
+            "QLabel {"
+            "    color: white;"
+            "    font-size: 15px;"
+            "    font-weight: bold;"
+            "    border: none;"
+            "}"
+            );
+
+        QLabel *nombreLabel = new QLabel(
+            QString::number(nombre) +
+            " formateur(s)"
+            );
+
+        nombreLabel->setStyleSheet(
+            "QLabel {"
+            "    color: #aaaaaa;"
+            "    font-size: 13px;"
+            "    border: none;"
+            "}"
+            );
+
+        topLayout->addWidget(specialiteLabel);
+        topLayout->addStretch();
+        topLayout->addWidget(nombreLabel);
+
+        cardLayout->addLayout(topLayout);
+
+        // =========================
+        // PROGRESS BAR + %
+        // =========================
+        QHBoxLayout *progressLayout = new QHBoxLayout();
+
+        QProgressBar *progressBar = new QProgressBar();
+
+        progressBar->setMinimum(0);
+        progressBar->setMaximum(100);
+        progressBar->setValue(static_cast<int>(pourcentage));
+
+        // On cache le texte par défaut
+        progressBar->setTextVisible(false);
+
+        QLabel *percentageLabel = new QLabel(
+            QString::number(pourcentage, 'f', 1) + "%"
+            );
+
+        percentageLabel->setFixedWidth(55);
+        percentageLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+        percentageLabel->setStyleSheet(
+            "QLabel {"
+            "    color: #e50914;"
+            "    font-size: 14px;"
+            "    font-weight: bold;"
+            "    border: none;"
+            "}"
+            );
+
+        progressLayout->addWidget(progressBar);
+        progressLayout->addWidget(percentageLabel);
+
+        cardLayout->addLayout(progressLayout);
+
+        // =========================
+        // AJOUT DE LA CARD
+        // =========================
+        mainLayout->addWidget(card);
+    }
+
+    mainLayout->addStretch();
+
+    dialog->exec();
+}
+
+void MainWindow::on_statistique_cour_clicked()
+{
+    QMap<QString, int> stats = c.statistiquesParNiveau();
+
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Statistiques des cours par niveau");
+    dialog->resize(650, 450);
+
+    // =========================
+    // STYLE DU DIALOG
+    // =========================
+    dialog->setStyleSheet(
+        "QDialog {"
+        "    background-color: #1e1e1e;"
+        "}"
+        "QLabel {"
+        "    color: white;"
+        "}"
+        "QProgressBar {"
+        "    border: none;"
+        "    background-color: #3a3a3a;"
+        "    border-radius: 8px;"
+        "    height: 14px;"
+        "    text-align: center;"
+        "}"
+        "QProgressBar::chunk {"
+        "    background-color: #e50914;"
+        "    border-radius: 8px;"
+        "}"
+        );
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(dialog);
+    mainLayout->setContentsMargins(25, 25, 25, 25);
+    mainLayout->setSpacing(18);
+
+    // =========================
+    // TITRE
+    // =========================
+    QLabel *title = new QLabel(
+        "Répartition des cours par niveau"
+        );
+
+    title->setStyleSheet(
+        "QLabel {"
+        "    color: white;"
+        "    font-size: 20px;"
+        "    font-weight: bold;"
+        "    padding-bottom: 10px;"
+        "}"
+        );
+
+    mainLayout->addWidget(title);
+
+    // =========================
+    // CALCUL DU TOTAL
+    // =========================
+    int total = 0;
+
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        total += it.value();
+    }
+
+    // =========================
+    // STATISTIQUES
+    // =========================
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        QString specialite = it.key();
+        int nombre = it.value();
+
+        double pourcentage = 0;
+
+        if (total > 0)
+        {
+            pourcentage = (nombre * 100.0) / total;
+        }
+
+        // =========================
+        // CARD
+        // =========================
+        QFrame *card = new QFrame();
+
+        card->setStyleSheet(
+            "QFrame {"
+            "    background-color: #292929;"
+            "    border: 1px solid #3d3d3d;"
+            "    border-radius: 12px;"
+            "}"
+            );
+
+        QVBoxLayout *cardLayout = new QVBoxLayout(card);
+
+        cardLayout->setContentsMargins(18, 15, 18, 15);
+        cardLayout->setSpacing(10);
+
+        // =========================
+        // LIGNE DU HAUT
+        // =========================
+        QHBoxLayout *topLayout = new QHBoxLayout();
+
+        QLabel *specialiteLabel = new QLabel(
+            specialite
+            );
+
+        specialiteLabel->setStyleSheet(
+            "QLabel {"
+            "    color: white;"
+            "    font-size: 15px;"
+            "    font-weight: bold;"
+            "    border: none;"
+            "}"
+            );
+
+        QLabel *nombreLabel = new QLabel(
+            QString::number(nombre) +
+            " cour(s)"
+            );
+
+        nombreLabel->setStyleSheet(
+            "QLabel {"
+            "    color: #aaaaaa;"
+            "    font-size: 13px;"
+            "    border: none;"
+            "}"
+            );
+
+        topLayout->addWidget(specialiteLabel);
+        topLayout->addStretch();
+        topLayout->addWidget(nombreLabel);
+
+        cardLayout->addLayout(topLayout);
+
+        // =========================
+        // PROGRESS BAR + %
+        // =========================
+        QHBoxLayout *progressLayout = new QHBoxLayout();
+
+        QProgressBar *progressBar = new QProgressBar();
+
+        progressBar->setMinimum(0);
+        progressBar->setMaximum(100);
+        progressBar->setValue(static_cast<int>(pourcentage));
+
+        // On cache le texte par défaut
+        progressBar->setTextVisible(false);
+
+        QLabel *percentageLabel = new QLabel(
+            QString::number(pourcentage, 'f', 1) + "%"
+            );
+
+        percentageLabel->setFixedWidth(55);
+        percentageLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+        percentageLabel->setStyleSheet(
+            "QLabel {"
+            "    color: #e50914;"
+            "    font-size: 14px;"
+            "    font-weight: bold;"
+            "    border: none;"
+            "}"
+            );
+
+        progressLayout->addWidget(progressBar);
+        progressLayout->addWidget(percentageLabel);
+
+        cardLayout->addLayout(progressLayout);
+
+        // =========================
+        // AJOUT DE LA CARD
+        // =========================
+        mainLayout->addWidget(card);
+    }
+
+    mainLayout->addStretch();
+
+    dialog->exec();
 }

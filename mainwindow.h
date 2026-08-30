@@ -55,6 +55,10 @@ private slots:
 
     void on_pdf_formateur_clicked();
 
+    void on_stat_formateur_clicked();
+
+    void on_statistique_cour_clicked();
+
 private:
     Ui::MainWindow *ui;
 

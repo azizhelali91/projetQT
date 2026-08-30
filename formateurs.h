@@ -56,6 +56,9 @@ public:
     QSqlQueryModel* chercher(QString column, QString text);
     QSqlQueryModel* tri(QString column, QString choix);
 
+    QMap<QString, int> statistiquesParSPECIALITE();
+
+
 private:
     int id_formateur;
     QString nom;

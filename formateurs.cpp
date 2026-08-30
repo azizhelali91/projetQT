@@ -218,3 +218,22 @@ QSqlQueryModel* formateurs::tri(QString column, QString choix)//(SELECT * FROM F
     model->setQuery("SELECT * FROM FORMATEURS ORDER BY " + column + " " + choix);
     return model;
 }
+
+
+QMap<QString, int> formateurs::statistiquesParSPECIALITE() {
+    QMap<QString, int> specialiteStats;
+
+    QSqlQuery query;
+    query.prepare("SELECT SPECIALITE, COUNT(*) as count FROM FORMATEURS GROUP BY SPECIALITE");
+
+    //list=QMap
+    if (query.exec()) {
+        while (query.next()) {
+            QString specialite = query.value(0).toString();
+            int count = query.value(1).toInt();
+            specialiteStats[specialite] = count;
+        }
+    }
+
+    return specialiteStats;
+}

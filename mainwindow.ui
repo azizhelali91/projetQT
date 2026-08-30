@@ -27,7 +27,7 @@
      <string notr="true">background-color:#87CEEB;</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_formateur">
      <attribute name="title">

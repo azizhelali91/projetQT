@@ -263,3 +263,21 @@ QSqlQueryModel* COURS::tri(QString column, QString choix)//(SELECT * FROM FORMAT
     model->setQuery("SELECT * FROM COURS ORDER BY " + column + " " + choix);
     return model;
 }
+
+QMap<QString, int> COURS::statistiquesParNiveau() {
+    QMap<QString, int> niveauStats;
+
+    QSqlQuery query;
+    query.prepare("SELECT NIVEAU, COUNT(*) as count FROM COURS GROUP BY NIVEAU");
+
+    //list=QMap
+    if (query.exec()) {
+        while (query.next()) {
+            QString niveau = query.value(0).toString();
+            int count = query.value(1).toInt();
+            niveauStats[niveau] = count;
+        }
+    }
+
+    return niveauStats;
+}
